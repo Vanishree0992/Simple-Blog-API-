@@ -1,0 +1,21 @@
+databases:
+  - name: blogdb
+    plan: free
+    databaseName: blogdb
+
+services:
+  - type: web
+    name: blog_api
+    plan: free
+    runtime: python
+    buildCommand: './build.sh'
+    startCommand: 'python -m gunicorn blog_project.wsgi:application -w 4 -b 0.0.0.0:$PORT'
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blogdb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: '2'
